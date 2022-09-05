@@ -63,6 +63,7 @@ def main():
     parser.add_argument("--detector-type", help="Type of the detector", default="FacenetDetector",
                         choices=["FacenetDetector"])
     parser.add_argument("--processes", help="Number of processes", default=2)
+    parser.add_argument("--output", help="Number of processes", default='')
     opt = parser.parse_args()
     print(opt)
 
@@ -76,8 +77,12 @@ def main():
     if dataset == 1:
         videos_paths = get_video_paths(opt.data_path, dataset)
     else:
-        os.makedirs(os.path.join(opt.data_path, "boxes"), exist_ok=True)
-        already_extracted = os.listdir(os.path.join(opt.data_path, "boxes"))
+        if opt.output == "":
+            os.makedirs(os.path.join(opt.data_path, "boxes"), exist_ok=True)
+            already_extracted = os.listdir(os.path.join(opt.data_path, "boxes"))
+        else:
+            os.makedirs(os.path.join(opt.output, "boxes"), exist_ok=True)
+            already_extracted = os.listdir(os.path.join(opt.output, "boxes"))
         for folder in os.listdir(opt.data_path):
             if "boxes" not in folder and "zip" not in folder:
                 if os.path.isdir(os.path.join(opt.data_path, folder)): # For training and test set
