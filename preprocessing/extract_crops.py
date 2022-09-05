@@ -113,7 +113,7 @@ if __name__ == '__main__':
         # paths.extend(get_video_paths(os.path.join(opt.data_path, "original_sequences"), dataset))
         paths = get_video_paths(opt.data_path, dataset)
     
-    with Pool(processes=cpu_count()-2) as p:
+    with Pool(processes=cpu_count()) as p:
         with tqdm(total=len(paths)) as pbar:
             for v in p.imap_unordered(partial(extract_video, root_dir=opt.data_path, dataset=dataset, opt=opt), paths):
                 pbar.update()
