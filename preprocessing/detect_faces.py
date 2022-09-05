@@ -12,10 +12,13 @@ from face_detector import VideoDataset
 from face_detector import VideoFaceDetector
 from utils import get_video_paths, get_method
 import argparse
+import torch
 
 
 def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_dataset, opt):
-    detector = face_detector.__dict__[detector_cls](device="cuda:0")
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+    print('Using device:', device)
+    detector = face_detector.__dict__[detector_cls](device=device)
 
     dataset = VideoDataset(videos)
     
