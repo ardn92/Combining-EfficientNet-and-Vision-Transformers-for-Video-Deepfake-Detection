@@ -19,15 +19,12 @@ from tqdm import tqdm
 
 from utils import get_video_paths, get_method, get_method_from_name
 
-def extract_video(video, root_dir, dataset, face_cords_path):
+def extract_video(video, root_dir, dataset, opt):
     try:
         if dataset == 0:
             bboxes_path = os.path.join(opt.data_path, "boxes", os.path.splitext(os.path.basename(video))[0] + ".json")
         else:
-            if face_cords_path == '':
-                bboxes_path = os.path.join(opt.data_path, "boxes", get_method_from_name(video), os.path.splitext(os.path.basename(video))[0] + ".json")
-            else:
-                bboxes_path = os.path.join(face_cords_path, "boxes", get_method_from_name(video), os.path.splitext(os.path.basename(video))[0] + ".json")
+            bboxes_path = os.path.join(opt.boxes_path, "boxes", get_method_from_name(video), os.path.splitext(os.path.basename(video))[0] + ".json")
         
         if not os.path.exists(bboxes_path) or not os.path.exists(video):
             return
@@ -80,7 +77,7 @@ def extract_video(video, root_dir, dataset, face_cords_path):
                 cv2.imwrite(os.path.join(opt.output_path, id, "{}_{}.png".format(i, j)), crop)
         if counter == 0:
             print(video, counter)
-    except e:
+    except Exception as e:
         print("Error:", e)
     
 
@@ -93,7 +90,7 @@ if __name__ == '__main__':
                         help='Videos directory')
     parser.add_argument('--output_path', default='', type=str,
                         help='Output directory')
-    parser.add_argument('--face_cords_path', default='', type=str,
+    parser.add_argument('--boxes_path', default='', type=str,
                         help='Face cordinates directory')
     opt = parser.parse_args()
     print(opt)
@@ -112,10 +109,11 @@ if __name__ == '__main__':
         paths = get_video_paths(opt.data_path, dataset, excluded_videos)
         #paths.extend(get_video_paths(opt.data_path, dataset, excluded_videos))
     else:
-        paths = get_video_paths(os.path.join(opt.data_path, "manipulated_sequences"), dataset)
-        paths.extend(get_video_paths(os.path.join(opt.data_path, "original_sequences"), dataset))
+        # paths = get_video_paths(os.path.join(opt.data_path, "manipulated_sequences"), dataset)
+        # paths.extend(get_video_paths(os.path.join(opt.data_path, "original_sequences"), dataset))
+        paths = get_video_paths(opt.data_path, dataset)
     
     with Pool(processes=cpu_count()-2) as p:
         with tqdm(total=len(paths)) as pbar:
-            for v in p.imap_unordered(partial(extract_video, root_dir=opt.data_path, dataset=dataset, face_cords_path=opt.face_cords_path), paths):
+            for v in p.imap_unordered(partial(extract_video, root_dir=opt.data_path, dataset=dataset, opt=opt), paths):
                 pbar.update()

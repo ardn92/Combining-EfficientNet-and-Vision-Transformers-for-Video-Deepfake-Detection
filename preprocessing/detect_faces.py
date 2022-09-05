@@ -1,5 +1,6 @@
 import argparse
 import json
+# from multiprocessing import set_start_method    # local
 import os
 import numpy as np
 from typing import Type
@@ -17,11 +18,11 @@ import torch
 
 def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_dataset, opt):
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
-    print('Using device:', device)
     detector = face_detector.__dict__[detector_cls](device=device)
 
     dataset = VideoDataset(videos)
-    
+
+    # loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
     loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=1, collate_fn=lambda x: x)
     missed_videos = []
     for item in tqdm(loader): 
@@ -29,7 +30,10 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         video, indices, frames = item[0]
         if selected_dataset == 1:
             method = get_method(video, opt.data_path)
-            out_dir = os.path.join(opt.data_path, "boxes", method)
+            if opt.output == "":
+                out_dir = os.path.join(opt.data_path, "boxes", method)
+            else:
+                out_dir = os.path.join(opt.output, "boxes", method)
         else:
             out_dir = os.path.join(opt.data_path, "boxes")
 
@@ -38,7 +42,6 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         if os.path.exists(out_dir) and "{}.json".format(id) in os.listdir(out_dir):
             continue
         batches = [frames[i:i + detector._batch_size] for i in range(0, len(frames), detector._batch_size)]
-      
         for j, frames in enumerate(batches):
             result.update({int(j * detector._batch_size) + i : b for i, b in zip(indices, detector._detect_faces(frames))})
         
@@ -79,13 +82,10 @@ def main():
     videos_paths = []
     if dataset == 1:
         videos_paths = get_video_paths(opt.data_path, dataset)
+
     else:
-        if opt.output == "":
-            os.makedirs(os.path.join(opt.data_path, "boxes"), exist_ok=True)
-            already_extracted = os.listdir(os.path.join(opt.data_path, "boxes"))
-        else:
-            os.makedirs(os.path.join(opt.output, "boxes"), exist_ok=True)
-            already_extracted = os.listdir(os.path.join(opt.output, "boxes"))
+        os.makedirs(os.path.join(opt.data_path, "boxes"), exist_ok=True)
+        already_extracted = os.listdir(os.path.join(opt.data_path, "boxes"))
         for folder in os.listdir(opt.data_path):
             if "boxes" not in folder and "zip" not in folder:
                 if os.path.isdir(os.path.join(opt.data_path, folder)): # For training and test set
@@ -100,4 +100,5 @@ def main():
 
 
 if __name__ == "__main__":
+    # set_start_method('fork')    # local
     main()
