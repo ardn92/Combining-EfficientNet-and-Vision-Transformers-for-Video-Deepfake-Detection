@@ -16,7 +16,7 @@ def get_video_paths(data_path, dataset, excluded_videos=[]):
             internal_folders = os.listdir(folder_path)
             for internal_folder in internal_folders:
                 internal_path = os.path.join(folder_path, internal_folder)
-                internal_path = os.path.join(internal_path, "videos")
+                internal_path = os.path.join(internal_path, "c23", "videos")
                 videos_paths.extend([os.path.join(internal_path, video_name) for video_name in os.listdir(internal_path)])
             
         else:
