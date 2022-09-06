@@ -96,7 +96,6 @@ def main():
             video_type = video_path.split('/')[-4]
 
             if {'name': video_name, 'method': video_type} in already_extracted:
-                print(video_name, video_type)
                 continue
             videos_paths.append(video_path)
 
