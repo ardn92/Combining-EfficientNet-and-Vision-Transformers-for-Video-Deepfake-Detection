@@ -2,6 +2,7 @@ import argparse
 import json
 # from multiprocessing import set_start_method    # local
 import os
+from random import shuffle
 import numpy as np
 from typing import Type
 
@@ -23,12 +24,12 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
     dataset = VideoDataset(videos)
 
     # loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
-    loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=1, collate_fn=lambda x: x)
+    loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=opt.batch_size, collate_fn=lambda x: x)
     missed_videos = []
     for item in tqdm(loader): 
         result = {}
         video, indices, frames = item[0]
-        print("processing... :", video, indices)
+        print("processing... :", video, len(indices), frames)
         if selected_dataset == 1:
             method = get_method(video, opt.data_path)
             if opt.output == "":
@@ -71,6 +72,7 @@ def main():
                         choices=["FacenetDetector"])
     parser.add_argument("--processes", help="Number of processes", default=2)
     parser.add_argument("--output", help="Number of processes", default='')
+    parser.add_argument("--batch_size", help="Number of processes", default=1)
     opt = parser.parse_args()
     print(opt)
 
@@ -98,6 +100,8 @@ def main():
 
             if {'name': video_name, 'method': video_type} in already_extracted or video_type == 'actors':
                 continue
+
+            shuffle(videos_paths)
             videos_paths.append(video_path)
 
         print(f'{len(videos_paths)} from the total {len(all_paths)} videos ...')    
