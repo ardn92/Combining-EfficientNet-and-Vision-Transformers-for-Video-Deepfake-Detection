@@ -2,5 +2,5 @@
 *.pyc
 notes.txt
 
-extractedfaces
-facecords
+extractedfaces/*
+facecords/*

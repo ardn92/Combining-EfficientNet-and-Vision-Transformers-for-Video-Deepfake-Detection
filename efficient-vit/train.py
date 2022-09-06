@@ -35,8 +35,10 @@ import yaml
 import argparse
 
 
-BASE_DIR = '../../deep_fakes/'
-DATA_DIR = os.path.join(BASE_DIR, "dataset")
+# BASE_DIR = '../../deep_fakes/'
+BASE_DIR = '/Volumes/T7/ghadir/datasets/'    # local
+# DATA_DIR = os.path.join(BASE_DIR, "dataset")
+DATA_DIR = os.path.join(BASE_DIR, "Faceforensic")    # local
 TRAINING_DIR = os.path.join(DATA_DIR, "training_set")
 VALIDATION_DIR = os.path.join(DATA_DIR, "validation_set")
 TEST_DIR = os.path.join(DATA_DIR, "test_set")
@@ -157,7 +159,8 @@ if __name__ == "__main__":
         channels = 1280
     else:
         channels = 2560
-        
+    
+    device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     model = EfficientViT(config=config, channels=channels, selected_efficient_net = opt.efficient_net)
     model.train()
     
@@ -165,7 +168,7 @@ if __name__ == "__main__":
     scheduler = lr_scheduler.StepLR(optimizer, step_size=config['training']['step-size'], gamma=config['training']['gamma'])
     starting_epoch = 0
     if os.path.exists(opt.resume):
-        model.load_state_dict(torch.load(opt.resume))
+        model.load_state_dict(torch.load(opt.resume, map_location=device))
         starting_epoch = int(opt.resume.split("checkpoint")[1].split("_")[0]) + 1 # The checkpoint's file name format should be "checkpoint_EPOCH"
     else:
         print("No checkpoint loaded.")
@@ -247,7 +250,7 @@ if __name__ == "__main__":
     del validation_dataset
     
 
-    model = model.cuda()
+    model = model.to(device)
     counter = 0
     not_improved_loss = 0
     previous_loss = math.inf
@@ -266,7 +269,7 @@ if __name__ == "__main__":
         for index, (images, labels) in enumerate(dl):
             images = np.transpose(images, (0, 3, 1, 2))
             labels = labels.unsqueeze(1)
-            images = images.cuda()
+            images = images.to(device)
             
             y_pred = model(images)
             y_pred = y_pred.cpu()
@@ -302,7 +305,7 @@ if __name__ == "__main__":
     
             val_images = np.transpose(val_images, (0, 3, 1, 2))
             
-            val_images = val_images.cuda()
+            val_images = val_images.to(device)
             val_labels = val_labels.unsqueeze(1)
             val_pred = model(val_images)
             val_pred = val_pred.cpu()

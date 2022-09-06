@@ -1,6 +1,6 @@
 import argparse
 import json
-# from multiprocessing import set_start_method    # local
+from multiprocessing import set_start_method    # local
 import os
 import numpy as np
 from typing import Type
@@ -22,7 +22,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
 
     dataset = VideoDataset(videos)
 
-    # loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
+    loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
     loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=1, collate_fn=lambda x: x)
     missed_videos = []
     for item in tqdm(loader): 
@@ -79,9 +79,28 @@ def main():
     else:
         dataset = 1
 
+    all_paths = []
     videos_paths = []
     if dataset == 1:
-        videos_paths = get_video_paths(opt.data_path, dataset)
+        all_paths = get_video_paths(opt.data_path, dataset)
+
+    
+        already_extracted = []
+        from pathlib import Path
+
+        for path in Path(opt.output).rglob('*.json'):
+            already_extracted.append({'name': path.name, 'method': str(path).split('/')[-2]})
+
+        for video_path in all_paths:
+            video_name = (video_path.split(".")[0] + ".json").split('/')[-1]
+            video_type = video_path.split('/')[-4]
+
+            if {'name': video_name, 'method': video_type} in already_extracted:
+                print(video_name, video_type)
+                continue
+            videos_paths.append(video_path)
+
+        print(f'{len(videos_paths)} from the total {len(all_paths)} videos ...')    
 
     else:
         os.makedirs(os.path.join(opt.data_path, "boxes"), exist_ok=True)
@@ -100,5 +119,5 @@ def main():
 
 
 if __name__ == "__main__":
-    # set_start_method('fork')    # local
+    set_start_method('fork')    # local
     main()
