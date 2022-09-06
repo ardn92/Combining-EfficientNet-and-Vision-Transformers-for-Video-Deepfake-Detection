@@ -28,6 +28,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
     for item in tqdm(loader): 
         result = {}
         video, indices, frames = item[0]
+        print("processing... :", video, indices)
         if selected_dataset == 1:
             method = get_method(video, opt.data_path)
             if opt.output == "":
@@ -95,7 +96,7 @@ def main():
             video_name = (video_path.split(".")[0] + ".json").split('/')[-1]
             video_type = video_path.split('/')[-4]
 
-            if {'name': video_name, 'method': video_type} in already_extracted:
+            if {'name': video_name, 'method': video_type} in already_extracted or video_type == 'actors':
                 continue
             videos_paths.append(video_path)
 
