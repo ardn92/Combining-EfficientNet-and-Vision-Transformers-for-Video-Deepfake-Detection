@@ -1,6 +1,6 @@
 import argparse
 import json
-from multiprocessing import set_start_method    # local
+# from multiprocessing import set_start_method    # local
 import os
 import numpy as np
 from typing import Type
@@ -22,7 +22,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
 
     dataset = VideoDataset(videos)
 
-    loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
+    # loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
     loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=1, collate_fn=lambda x: x)
     missed_videos = []
     for item in tqdm(loader): 
@@ -118,5 +118,5 @@ def main():
 
 
 if __name__ == "__main__":
-    set_start_method('fork')    # local
+    # set_start_method('fork')    # local
     main()
