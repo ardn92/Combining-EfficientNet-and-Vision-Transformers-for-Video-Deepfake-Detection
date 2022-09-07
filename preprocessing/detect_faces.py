@@ -120,7 +120,8 @@ def main():
             shuffle(videos_paths)
             videos_paths.append(video_path)
 
-        print(f'{len(videos_paths)} from the total {len(all_paths)} videos ...')    
+        print(f'{already_extracted} already processed.')
+        print(f'{len(videos_paths)} from the total {len(all_paths)} videos ...')
 
     else:
         os.makedirs(os.path.join(opt.data_path, "boxes"), exist_ok=True)
