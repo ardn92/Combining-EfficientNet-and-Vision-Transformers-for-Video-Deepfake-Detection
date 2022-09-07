@@ -101,7 +101,7 @@ def main():
             if {'name': video_name, 'method': video_type} in already_extracted or video_type == 'actors':
                 continue
 
-            # shuffle(videos_paths)
+            shuffle(videos_paths)
             videos_paths.append(video_path)
 
         print(f'{len(videos_paths)} from the total {len(all_paths)} videos ...')    
