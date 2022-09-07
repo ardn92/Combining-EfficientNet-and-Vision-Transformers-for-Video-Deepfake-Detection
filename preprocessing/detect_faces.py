@@ -34,7 +34,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         k = 0
         for item in tqdm(loader):
             print('\n ---------------------------------------------------')
-            print(f'***item {i}being processing...')
+            print(f'***item {i} being processing...')
             result = {}
             video, indices, frames = item[0]
             print(f"***path: ", str(video).split('Faceforensic')[1], len(indices))
@@ -120,7 +120,7 @@ def main():
             shuffle(videos_paths)
             videos_paths.append(video_path)
 
-        print(f'{already_extracted} already processed.')
+        print(f'{len(already_extracted)} already processed.')
         print(f'{len(videos_paths)} from the total {len(all_paths)} videos ...')
 
     else:
