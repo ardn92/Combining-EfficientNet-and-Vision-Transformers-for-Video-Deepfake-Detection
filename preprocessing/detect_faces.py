@@ -28,10 +28,11 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
         # loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=int(opt.batch_size), collate_fn=lambda x: x)
         missed_videos = []
+        i = 1
         for item in tqdm(loader): 
             result = {}
             video, indices, frames = item[0]
-            print("processing... :", video, len(indices))
+            print(f"processing item {i}:", str(video).split('Faceforensic')[1], len(indices))
             if selected_dataset == 1:
                 method = get_method(video, opt.data_path)
                 if opt.output == "":
@@ -61,7 +62,9 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
                 print('writing done')
             else:
                 missed_videos.append(id)
-                print('missed video; id: ', id, "result: ", result)
+                print(f'missed video in item {i}; id: ', id, "result: ", result)
+
+            i += 1
 
         if len(missed_videos) > 0:
             print("The detector did not find faces inside the following videos:")
