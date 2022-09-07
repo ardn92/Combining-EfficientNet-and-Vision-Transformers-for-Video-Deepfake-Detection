@@ -31,7 +31,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=int(opt.batch_size), collate_fn=lambda x: x)
         missed_videos = []
         i = 1
-        j = 0
+        k = 0
         for item in tqdm(loader):
             print(f'***item {i}. Processing...')
             result = {}
@@ -64,12 +64,13 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
                 with open(os.path.join(out_dir, "{}.json".format(id)), "w") as f:
                     json.dump(result, f)
                 print(f'***writing item {i} done.')
-                j += 1
+                k += 1
             else:
                 missed_videos.append(id)
                 print(f'***missed video in item {i}; id: ', id, "result: ", result)
 
-            print(f'***Success: {j} out of {i} items')
+            print(f'***Success: {k} out of {i} items')
+            print('---------------------------------------------------')
             i += 1
 
         if len(missed_videos) > 0:
