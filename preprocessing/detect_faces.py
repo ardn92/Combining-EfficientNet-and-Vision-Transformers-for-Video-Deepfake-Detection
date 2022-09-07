@@ -30,9 +30,10 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         # loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
         loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=int(opt.batch_size), collate_fn=lambda x: x)
         missed_videos = []
-        i = 1
+        i = 0
         k = 0
         for item in tqdm(loader):
+            print('\n ---------------------------------------------------')
             print(f'***item {i}. Processing...')
             result = {}
             video, indices, frames = item[0]
@@ -70,7 +71,6 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
                 print(f'***missed video in item {i}; id: ', id, "result: ", result)
 
             print(f'***Success: {k} out of {i} items')
-            print('---------------------------------------------------')
             i += 1
 
         if len(missed_videos) > 0:
