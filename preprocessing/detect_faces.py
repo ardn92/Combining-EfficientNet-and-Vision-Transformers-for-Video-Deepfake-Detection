@@ -16,6 +16,8 @@ from face_detector import VideoFaceDetector
 from utils import get_video_paths, get_method
 import argparse
 import torch
+import warnings
+warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning) 
 
 
 def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_dataset, opt):
@@ -29,10 +31,12 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=int(opt.batch_size), collate_fn=lambda x: x)
         missed_videos = []
         i = 1
-        for item in tqdm(loader): 
+        j = 0
+        for item in tqdm(loader):
+            print(f'***item {i}. Processing...')
             result = {}
             video, indices, frames = item[0]
-            print(f"processing item {i}:", str(video).split('Faceforensic')[1], len(indices))
+            print(f"***Name-{i}:", str(video).split('Faceforensic')[1], len(indices))
             if selected_dataset == 1:
                 method = get_method(video, opt.data_path)
                 if opt.output == "":
@@ -46,24 +50,26 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
 
             if os.path.exists(out_dir) and "{}.json".format(id) in os.listdir(out_dir):
                 continue
-            print("creating batches...")
+            print("***creating batches...")
             batches = [frames[i:i + detector._batch_size] for i in range(0, len(frames), detector._batch_size)]
-            print("batch created")
+            print("***batch created")
             for j, frames in enumerate(batches):
                 result.update({int(j * detector._batch_size) + i : b for i, b in zip(indices, detector._detect_faces(frames))})
-            print("looped over batches. batch stats :", len(batches))
+            print("***looped over batches. batch length :", len(batches))
         
             os.makedirs(out_dir, exist_ok=True)
-            print('result: ', len(result))
+            print('***result length: ', len(result))
             if len(result) > 0:
-                print('writing results to dir - stats: (len, size)', len(result), sys.getsizeof(result))
+                print('***writing results to dir - stats: (len, size)', len(result), sys.getsizeof(result))
                 with open(os.path.join(out_dir, "{}.json".format(id)), "w") as f:
                     json.dump(result, f)
-                print('writing done')
+                print(f'***writing item {i} done.')
+                j += 1
             else:
                 missed_videos.append(id)
-                print(f'missed video in item {i}; id: ', id, "result: ", result)
+                print(f'***missed video in item {i}; id: ', id, "result: ", result)
 
+            print(f'***Success: {j} out of {i} items')
             i += 1
 
         if len(missed_videos) > 0:
@@ -73,7 +79,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
 
 
     except Exception as e:
-        print('Error Occured: ', e)
+        print('***Error Occured: ', e)
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default="DFDC", type=str,
