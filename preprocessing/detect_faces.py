@@ -30,14 +30,14 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         # loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
         loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=int(opt.batch_size), collate_fn=lambda x: x)
         missed_videos = []
-        i = 0
+        i = 1
         k = 0
         for item in tqdm(loader):
             print('\n ---------------------------------------------------')
-            print(f'***item {i}. Processing...')
+            print(f'***item {i}being processing...')
             result = {}
             video, indices, frames = item[0]
-            print(f"***Name-{i}:", str(video).split('Faceforensic')[1], len(indices))
+            print(f"***path: ", str(video).split('Faceforensic')[1], len(indices))
             if selected_dataset == 1:
                 method = get_method(video, opt.data_path)
                 if opt.output == "":
@@ -51,15 +51,12 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
 
             if os.path.exists(out_dir) and "{}.json".format(id) in os.listdir(out_dir):
                 continue
-            print("***creating batches...")
             batches = [frames[i:i + detector._batch_size] for i in range(0, len(frames), detector._batch_size)]
-            print("***batch created")
             for j, frames in enumerate(batches):
                 result.update({int(j * detector._batch_size) + i : b for i, b in zip(indices, detector._detect_faces(frames))})
             print("***looped over batches. batch length :", len(batches))
         
             os.makedirs(out_dir, exist_ok=True)
-            print('***result length: ', len(result))
             if len(result) > 0:
                 print('***writing results to dir - stats: (len, size)', len(result), sys.getsizeof(result))
                 with open(os.path.join(out_dir, "{}.json".format(id)), "w") as f:
