@@ -19,7 +19,7 @@ contrastive-learner==0.1.1
 cvt==0.0.10
 cycler==0.10.0
 decorator==4.4.2
-dlib==19.22.0
+# dlib==19.22.0
 docker==5.0.0
 efficientnet-pytorch==0.7.1
 einops==0.3.0
