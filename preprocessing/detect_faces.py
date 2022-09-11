@@ -33,10 +33,10 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         missed_videos = []
         i = 1
         k = 0
-        base_time = time.time()
         for item in tqdm(loader):
         # for item in loader:
             start = time.time()
+            print('------loop2loop: ', start - end)
             print('\n ---------------------------------------------------')
             print(f'***item {i} being processing from {len(dataset)}...')
             result = {}
@@ -82,7 +82,6 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
             i += 1
             end = time.time()
             print('sample total: ', end - start)
-            print('Total: ', end - base_time)
 
         if len(missed_videos) > 0:
             print("The detector did not find faces inside the following videos:")
