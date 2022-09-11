@@ -29,7 +29,8 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         dataset = VideoDataset(videos)
 
         # loader = DataLoader(dataset, shuffle=False, num_workers=12, batch_size=1, collate_fn=lambda x: x)    # local
-        loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=int(opt.batch_size), collate_fn=lambda x: x)
+        # loader = DataLoader(dataset, shuffle=False, num_workers=opt.processes, batch_size=int(opt.batch_size), collate_fn=lambda x: x)
+        loader = DataLoader(dataset, shuffle=False, num_workers=0, batch_size=int(opt.batch_size))
         missed_videos = []
         i = 1
         k = 0
