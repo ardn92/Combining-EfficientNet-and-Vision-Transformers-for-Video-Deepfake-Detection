@@ -6,7 +6,7 @@ import sys
 from random import shuffle
 import numpy as np
 from typing import Type
-
+import time
 from torch.utils.data.dataloader import DataLoader
 from tqdm import tqdm
 
@@ -17,7 +17,8 @@ from utils import get_video_paths, get_method
 import argparse
 import torch
 import warnings
-warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning) 
+warnings.filterwarnings("ignore")
+# warnings.filterwarnings("ignore", category=np.VisibleDeprecationWarning) 
 
 
 def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_dataset, opt):
@@ -32,7 +33,9 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         missed_videos = []
         i = 1
         k = 0
+        
         for item in tqdm(loader):
+            start = time.time()
             print('\n ---------------------------------------------------')
             print(f'***item {i} being processing...')
             result = {}
@@ -51,11 +54,17 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
 
             if os.path.exists(out_dir) and "{}.json".format(id) in os.listdir(out_dir):
                 continue
+            
+            t1 = time.time()
+            print('------process_videos initialization: ', t1 - start)
             batches = [frames[i:i + detector._batch_size] for i in range(0, len(frames), detector._batch_size)]
+            t2 = time.time()
+            print('------batches: ', t2 - t1)
             for j, frames in enumerate(batches):
                 result.update({int(j * detector._batch_size) + i : b for i, b in zip(indices, detector._detect_faces(frames))})
             print("***looped over batches. batch length :", len(batches))
-        
+            t3 = time.time()
+            print('------detection: ', t3 - t2)
             os.makedirs(out_dir, exist_ok=True)
             if len(result) > 0:
                 print('***writing results to dir - stats: (len, size)', len(result), sys.getsizeof(result))
@@ -66,9 +75,12 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
             else:
                 missed_videos.append(id)
                 print(f'***missed video in item {i}; id: ', id, "result: ", result)
-
+            t4 = time.time()
+            print('------saving: ', t4 - t3)
             print(f'***Success: {k} out of {i} items')
             i += 1
+            end = time.time()
+            print('total: ', end - start)
 
         if len(missed_videos) > 0:
             print("The detector did not find faces inside the following videos:")
@@ -78,6 +90,8 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
 
     except Exception as e:
         print('***Error Occured: ', e)
+
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--dataset', default="DFDC", type=str,
