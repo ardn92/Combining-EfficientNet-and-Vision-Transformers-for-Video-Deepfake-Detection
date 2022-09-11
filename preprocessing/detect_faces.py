@@ -33,6 +33,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         missed_videos = []
         i = 1
         k = 0
+        end = time.time()
         for item in tqdm(loader):
         # for item in loader:
             start = time.time()
