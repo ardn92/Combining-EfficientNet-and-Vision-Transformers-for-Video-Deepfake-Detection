@@ -34,10 +34,11 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         i = 1
         k = 0
         
-        for item in tqdm(loader):
+        # for item in tqdm(loader):
+        for item in loader:
             start = time.time()
             print('\n ---------------------------------------------------')
-            print(f'***item {i} being processing...')
+            print(f'***item {i} being processing from {len(dataset)}...')
             result = {}
             video, indices, frames = item[0]
             print(f"***path: ", str(video).split('Faceforensic')[1], len(indices))
