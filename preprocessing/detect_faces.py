@@ -39,7 +39,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
             start = time.time()
             print('---****......****---loop2loop: ', start - end)
             print('\n--------------------------------------------------------------------------------')
-            print('***Item - stats: (len, size)', len(item), sys.getsizeof(item))
+            print('***Data stats: (len, size)', len(item), sys.getsizeof(item))
             print(f'***item {i} being processing from {len(dataset)}...')
             result = {}
             video, indices, frames = item[0]
