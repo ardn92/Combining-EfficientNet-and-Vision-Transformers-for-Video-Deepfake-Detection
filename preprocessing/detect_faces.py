@@ -35,6 +35,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         k = 0
         end = time.time()
         for item in tqdm(loader):
+            print('item: ', len(item))
         # for item in loader:
             start = time.time()
             print('------loop2loop: ', start - end)
@@ -42,6 +43,10 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
             print(f'***item {i} being processing from {len(dataset)}...')
             result = {}
             video, indices, frames = item[0]
+            print('video: ', video[0])
+            print('indices: ', indices[0])
+            print('frames: ', frames[0])
+
             print(f"***path: ", str(video).split('Faceforensic')[1], len(indices))
             if selected_dataset == 1:
                 method = get_method(video, opt.data_path)
@@ -61,7 +66,6 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
             print('------process_videos initialization: ', t1 - start)
             batches = [frames[i:i + detector._batch_size] for i in range(0, len(frames), detector._batch_size)]
             t2 = time.time()
-            print('------batches: ', t2 - t1)
             for j, frames in enumerate(batches):
                 result.update({int(j * detector._batch_size) + i : b for i, b in zip(indices, detector._detect_faces(frames))})
             print("***looped over batches. batch length :", len(batches))
@@ -82,7 +86,7 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
             print(f'***Success: {k} out of {i} items')
             i += 1
             end = time.time()
-            print('sample total: ', end - start)
+            print('------sample total: ', end - start)
 
         if len(missed_videos) > 0:
             print("The detector did not find faces inside the following videos:")
