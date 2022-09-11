@@ -35,11 +35,11 @@ def process_videos(videos, detector_cls: Type[VideoFaceDetector], selected_datas
         k = 0
         end = time.time()
         for item in tqdm(loader):
-            print('***Item - stats: (len, size)', len(item), sys.getsizeof(item))
         # for item in loader:
             start = time.time()
-            print('------loop2loop: ', start - end)
-            print('\n ---------------------------------------------------')
+            print('---****......****---loop2loop: ', start - end)
+            print('\n--------------------------------------------------------------------------------')
+            print('***Item - stats: (len, size)', len(item), sys.getsizeof(item))
             print(f'***item {i} being processing from {len(dataset)}...')
             result = {}
             video, indices, frames = item[0]
